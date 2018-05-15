@@ -1,0 +1,46 @@
+{
+  "name": "backsass",
+  "version": "0.0.1",
+  "description": "A Sass to React compiler",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rrdelaney/Backsass.git"
+  },
+  "keywords": [
+    "sass",
+    "css",
+    "css-in-js",
+    "react",
+    "reactjs",
+    "react-css",
+    "reason",
+    "reasonml",
+    "bucklescript",
+    "reason-css"
+  ],
+  "author": "Ryan Delaney <rrdelaney@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rrdelaney/Backsass/issues"
+  },
+  "homepage": "https://github.com/rrdelaney/Backsass#readme",
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.47",
+    "@babel/types": "^7.0.0-beta.47",
+    "babel-plugin-emotion": "^9.1.2",
+    "fb-watchman": "^2.0.0",
+    "meow": "^5.0.0",
+    "postcss": "^6.0.22",
+    "prettier": "^1.12.1",
+    "sass": "^1.3.2"
+  },
+  "devDependencies": {
+    "@glennsl/bs-jest": "^0.4.2",
+    "bs-platform": "^3.0.0",
+    "jest": "^22.4.3"
+  }
+}

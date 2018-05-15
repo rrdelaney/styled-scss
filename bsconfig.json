@@ -1,0 +1,12 @@
+{
+  "name": "backsass",
+  "version": "0.0.1",
+  "sources": ["bindings", "src"],
+  "bs-dependencies": ["@glennsl/bs-jest"],
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "refmt": 3,
+  "suffix": ".bs.js"
+}

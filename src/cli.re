@@ -38,4 +38,4 @@ let rec printDecls =
   | Postcss.Decl(node) => print_endline(node.prop ++ ": " ++ node.value)
   | Postcss.Unknown(_) => ();
 
-ast |> Postcss.Encoder.node |> Js.log;
+ast |> Postcss.stringify |> Js.log;

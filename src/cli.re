@@ -28,6 +28,14 @@ let fileName = files[0];
 
 let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
 
-let ast = Postcss.parse(fileSource, Postcss.options(~from_=fileName, ()));
+let ast =
+  Postcss.parse(fileSource, Postcss.Options.make(~from_=fileName, ()));
 
-Js.log(ast);
+let rec printDecls =
+  fun
+  | Postcss.Root(node) => Array.iter(printDecls, node.nodes)
+  | Postcss.Atrule(node) => Array.iter(printDecls, node.nodes)
+  | Postcss.Decl(node) => print_endline(node.prop ++ ": " ++ node.value)
+  | Postcss.Unknown(_) => ();
+
+ast |> Postcss.Encoder.node |> Js.log;

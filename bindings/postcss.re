@@ -19,6 +19,7 @@ module Internal = {
     let root = "root";
     let atrule = "atrule";
     let decl = "decl";
+    let rule = "rule";
   };
   type node = {. "type": string};
   [@bs.module "postcss"] external parse : (string, Options.t) => node = "";
@@ -38,26 +39,33 @@ type source = {
 
 type root = {
   source,
-  nodes: array(node),
   raws: Internal.Raws.t,
+  nodes: array(node),
 }
 and atrule = {
   source,
+  raws: Internal.Raws.t,
   name: string,
   params: string,
   nodes: array(node),
-  raws: Internal.Raws.t,
 }
 and decl = {
   source,
+  raws: Internal.Raws.t,
   prop: string,
   value: string,
+}
+and rule = {
+  source,
   raws: Internal.Raws.t,
+  selector: string,
+  mutable nodes: array(node),
 }
 and node =
   | Root(root)
   | Atrule(atrule)
   | Decl(decl)
+  | Rule(rule)
   | Unknown(string);
 
 module Decoder = {
@@ -76,6 +84,7 @@ module Decoder = {
     (Internal.Type.root, root),
     (Internal.Type.atrule, atrule),
     (Internal.Type.decl, decl),
+    (Internal.Type.rule, rule),
   ]
   and node = json => {
     let kind = json |> Json.Decode.field("type", Json.Decode.string);
@@ -110,6 +119,15 @@ module Decoder = {
         prop: json |> field("prop", string),
         value: json |> field("value", string),
         raws: json |> field("raws", Internal.Raws.fromJson),
+      },
+    )
+  and rule = json =>
+    Rule(
+      Json.Decode.{
+        source: json |> field("source", source),
+        nodes: json |> field("nodes", array(node)),
+        raws: json |> field("raws", Internal.Raws.fromJson),
+        selector: json |> field("selector", string),
       },
     )
   and unknown = json => {
@@ -165,11 +183,22 @@ module Encoder = {
         ("raws", Internal.Raws.toJson(data.raws)),
       ])
     )
+  and rule = (data: rule) =>
+    Json.Encode.(
+      object_([
+        ("type", string(Internal.Type.rule)),
+        ("source", source(data.source)),
+        ("selector", string(data.selector)),
+        ("nodes", array(node, data.nodes)),
+        ("raws", Internal.Raws.toJson(data.raws)),
+      ])
+    )
   and node =
     fun
     | Root(data) => root(data)
     | Atrule(data) => atrule(data)
     | Decl(data) => decl(data)
+    | Rule(data) => rule(data)
     | Unknown(_) => raise(Not_found);
   let encode = json => {
     let data = node(json);

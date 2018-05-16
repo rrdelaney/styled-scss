@@ -33,6 +33,7 @@
     "@babel/types": "^7.0.0-beta.47",
     "@glennsl/bs-json": "^1.3.2",
     "babel-plugin-emotion": "^9.1.2",
+    "chalk": "^2.4.1",
     "fb-watchman": "^2.0.0",
     "meow": "^5.0.0",
     "postcss": "^6.0.22",

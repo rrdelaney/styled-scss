@@ -1,3 +1,18 @@
+let lastStage = ref(1);
+
+let printStageName = name => {
+  Js.log(
+    Chalk.green("=== Stage " ++ string_of_int(lastStage^) ++ ": ")
+    ++ Chalk.yellow(name),
+  );
+  lastStage := lastStage^ + 1;
+};
+
+let printAst = ast => ast |> Postcss.stringify |> Js.log;
+
+let prettyPrintAst = ast =>
+  ast |> Postcss.stringify |> Prettier.formatCss |> Js.log;
+
 [@bs.deriving abstract]
 type flags = {
   [@bs.optional]
@@ -31,11 +46,30 @@ let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
 let ast =
   Postcss.parse(fileSource, Postcss.Options.make(~from_=fileName, ()));
 
-let rec printDecls =
-  fun
-  | Postcss.Root(node) => Array.iter(printDecls, node.nodes)
-  | Postcss.Atrule(node) => Array.iter(printDecls, node.nodes)
-  | Postcss.Decl(node) => print_endline(node.prop ++ ": " ++ node.value)
-  | Postcss.Unknown(_) => ();
+printStageName("Parsed AST");
 
-ast |> Postcss.stringify |> Js.log;
+printAst(ast);
+
+let metadata = EmotionMetadata.extract(ast);
+
+printStageName("Metadata Extracted");
+
+printAst(ast);
+
+let sassSource = Postcss.stringify(ast);
+
+let compilation = Sass.renderSync(Sass.options(~data=sassSource, ()));
+
+let cssSource = compilation |. Sass.Result.css |. Sass.Buffer.toString();
+
+printStageName("Compiled with Sass");
+
+Js.log(cssSource);
+
+let cssAst = Postcss.parse(cssSource, Postcss.Options.make());
+
+let nestedAst = Renest.nestComponentRules(cssAst);
+
+printStageName("Rules nested");
+
+prettyPrintAst(nestedAst);

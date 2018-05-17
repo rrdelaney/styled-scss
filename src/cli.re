@@ -73,3 +73,16 @@ let nestedAst = Renest.nestComponentRules(cssAst);
 printStageName("Rules nested");
 
 prettyPrintAst(nestedAst);
+
+module T = Babel_types;
+
+let s =
+  T.taggedTemplateExpression(
+    T.memberExpression(T.identifier("styled"), T.identifier("div")),
+    T.templateLiteral(
+      [|T.templateElement(T.value(~raw="display: none;"))|],
+      [||],
+    ),
+  );
+
+Prettier.Debug.formatAST(s)##formatted |> Js.log;

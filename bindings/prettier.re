@@ -7,3 +7,9 @@ type options = {
 [@bs.module "prettier"] external format : (string, options) => string = "";
 
 let formatCss = source => format(source, options(~parser="css", ()));
+
+module Debug = {
+  type output = {. "formatted": string};
+  [@bs.module "prettier"] [@bs.scope "__debug"]
+  external formatAST : Babel_types.node => output = "";
+};

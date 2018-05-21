@@ -1,3 +1,6 @@
+open Belt;
+
+
 /***
  * Retrieves any child nodes from a Postcss AST node.
  */
@@ -39,8 +42,8 @@ type metadata = {
  * Empty metadata to start with.
  */
 let emptyMetadata = {
-  components: Belt.Map.String.empty,
-  ifConditions: Belt.Map.String.empty,
+  components: Map.String.empty,
+  ifConditions: Map.String.empty,
 };
 
 
@@ -48,24 +51,26 @@ let emptyMetadata = {
  * Extracts a component name from a string like "PrettyButton($prop: int)".
  */
 let extractComponentName = str =>
-  str |> Js.String.split("(") |. Array.get(0);
+  str |> Js.String.split("(") |. Array.getExn(0);
 
 
 /***
  * Extracts a prop definitions from a string like "PrettyButton($prop: int)".
  */
 let extractProps = str => {
-  let propsDef = str |. Js.String.split("(") |. Belt.Array.get(1);
+  let propsDef = str |. Js.String.split("(") |. Array.get(1);
   switch (propsDef) {
   | Some(props) =>
     props
     |. Js.String.split(",")
-    |. Belt.Array.map(propWithType => {
+    |. Array.map(propWithType => {
          let propDef = Js.String.split(":", propWithType);
-         (Js.String.trim(propDef[0]), Js.String.trim(propDef[1]));
+         let propName = Array.getExn(propDef, 0);
+         let propType = Array.getExn(propDef, 1);
+         (Js.String.trim(propName), Js.String.trim(propType));
        })
-    |. Belt.Map.String.fromArray
-  | None => Belt.Map.String.empty
+    |. Map.String.fromArray
+  | None => Map.String.empty
   };
 };
 
@@ -104,7 +109,7 @@ let ifConditionSelector = metadata =>
 let addIfCondition = (params, metadata) => {
   ...metadata,
   ifConditions:
-    Belt.Map.String.set(
+    Map.String.set(
       metadata.ifConditions,
       ifConditionSelector(metadata),
       {condition: params},
@@ -121,11 +126,11 @@ let rec extract = (~replaceSelf=_newNode => (), ~metadata=emptyMetadata, node) =
   switch (node) {
   | Postcss.Root(root) =>
     root.nodes
-    |. Belt.Array.mapWithIndex((index, node) => (index, node))
-    |. Belt.Array.reduce(
+    |. Array.mapWithIndex((index, node) => (index, node))
+    |. Array.reduce(
          metadata,
          (metadata, (index, node)) => {
-           let replaceNode = newNode => root.nodes[index] = newNode;
+           let replaceNode = Array.setExn(root.nodes, index);
            extract(~replaceSelf=replaceNode, ~metadata, node);
          },
        )
@@ -174,11 +179,11 @@ let rec extract = (~replaceSelf=_newNode => (), ~metadata=emptyMetadata, node) =
  */
 and extractNodes = (nodeArray, metadata) =>
   nodeArray
-  |. Belt.Array.mapWithIndex((index, node) => (index, node))
-  |. Belt.Array.reduce(
+  |. Array.mapWithIndex((index, node) => (index, node))
+  |. Array.reduce(
        metadata,
        (metadata, (index, node)) => {
-         let replaceNode = newNode => nodeArray[index] = newNode;
+         let replaceNode = Array.setExn(nodeArray, index);
          extract(~replaceSelf=replaceNode, ~metadata, node);
        },
      );

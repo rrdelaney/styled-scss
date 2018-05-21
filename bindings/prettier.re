@@ -8,6 +8,8 @@ type options = {
 
 let formatCss = source => format(source, options(~parser="css", ()));
 
+[@bs.module "prettier"] external formatJs : string => string = "format";
+
 module Debug = {
   type output = {. "formatted": string};
   [@bs.module "prettier"] [@bs.scope "__debug"]

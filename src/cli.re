@@ -70,19 +70,14 @@ let cssAst = Postcss.parse(cssSource, Postcss.Options.make());
 
 let nestedAst = Renest.nestComponentRules(cssAst);
 
-printStageName("Rules nested");
+printStageName("Insert statements");
 
 prettyPrintAst(nestedAst);
 
-module T = Babel_types;
+let jsAst = ComponentBuilder.buildComponents(nestedAst, metadata);
 
-let s =
-  T.taggedTemplateExpression(
-    T.memberExpression(T.identifier("styled"), T.identifier("div")),
-    T.templateLiteral(
-      [|T.templateElement(T.value(~raw="display: none;"))|],
-      [||],
-    ),
-  );
+let jsProgram = Babel_generator.generate(jsAst);
 
-Prettier.Debug.formatAST(s)##formatted |> Js.log;
+printStageName("Generate Emotion");
+
+Js.log(Prettier.formatJs(jsProgram##code));

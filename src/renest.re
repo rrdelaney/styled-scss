@@ -1,3 +1,6 @@
+open Belt;
+
+
 /***
  * Nests rule nodes as far as they can be nested, following Sass nesting.
  *
@@ -7,7 +10,7 @@
 let rec foldNodes = nodes => {
   /* Reference to the last selector that only had one element. */
   let lastRoot = ref(None);
-  Belt.Array.keepMap(nodes, node =>
+  Array.keepMap(nodes, node =>
     switch (node) {
     /* Finds a rule with a selector with no spaces. */
     | Postcss.Rule({selector} as rule)

@@ -76,8 +76,14 @@ prettyPrintAst(nestedAst);
 
 let jsAst = ComponentBuilder.buildComponents(nestedAst, metadata);
 
-let jsProgram = Babel_generator.generate(jsAst);
+let jsProgram = Babel_generator.generate(jsAst)##code;
 
 printStageName("Generate Emotion");
 
-Js.log(Prettier.formatJs(jsProgram##code));
+Js.log(jsProgram);
+
+let optimizedProgram = OptimizeEmotion.optimize(jsProgram, fileName);
+
+printStageName("Optimize output");
+
+Js.log(optimizedProgram);

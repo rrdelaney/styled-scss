@@ -1,5 +1,5 @@
 {
-  "name": "backsass",
+  "name": "styled-scss",
   "version": "0.0.1",
   "description": "A Sass to React compiler",
   "main": "index.js",

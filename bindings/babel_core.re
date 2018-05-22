@@ -7,15 +7,39 @@ module Plugin = {
     fromArray([|fromString(name), fromOptions(options)|]);
 };
 
-type options = {
-  .
-  "plugins": array(Plugin.t),
-  "filename": string,
+module Options = {
+  [@bs.deriving abstract]
+  type options = {
+    plugins: array(Plugin.t),
+    filename: string,
+    [@bs.optional]
+    ast: bool,
+    [@bs.optional]
+    code: bool,
+  };
 };
 
 [@bs.module "@babel/core"]
-external transform : (string, options, Babel_generator.output => unit) => unit =
+external transform :
+  (string, Options.options, Babel_generator.output => unit) => unit =
   "";
 
 [@bs.module "@babel/core"]
-external transformSync : (string, options) => Babel_generator.output = "";
+external transformSync : (string, Options.options) => Babel_generator.output =
+  "";
+
+[@bs.module "@babel/core"]
+external transformFromAst :
+  (
+    Babel_types.node,
+    string,
+    Options.options,
+    Babel_generator.output => unit
+  ) =>
+  unit =
+  "";
+
+[@bs.module "@babel/core"]
+external transformFromAstSync :
+  (Babel_types.node, string, Options.options) => Babel_generator.output =
+  "";

@@ -17,6 +17,7 @@ lib
 .merlin
 src/*.bs.js
 bindings/*.bs.js
+.bsb.lock
 
 # Test files
 test.scss

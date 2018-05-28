@@ -166,6 +166,9 @@ let rec extract =
     extractNodes(~nodes, ~metadata, ~component=currentComponent)
 
   /* Terminal things like declarations end the recursion. */
+  /* | Postcss.Decl({value} as decl) when Option.isSome(currentComponent) =>
+     let {props} = Option.getExn(currentComponent); */
+
   | _ => metadata
   }
 /** Runs `extract` over an array of nodes. */

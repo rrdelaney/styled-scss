@@ -1,11 +1,8 @@
 open Belt;
 
-/**
-  Nests rule nodes as far as they can be nested, following Sass nesting.
-
-  Note that this mutates the AST in place, and also returns a new node array.
-  It's a little weird, but it works ok.
- */
+/** Nests rule nodes as far as they can be nested, following Sass nesting.
+Note that this mutates the AST in place, and also returns a new node array.
+It's a little weird, but it works ok. */
 let rec foldNodes = nodes => {
   /* Reference to the last selector that only had one element. */
   let lastRoot = ref(None);
@@ -50,10 +47,8 @@ let rec foldNodes = nodes => {
   );
 };
 
-/**
-  Folds up any CSS rules that can be nested under each other. Returns a new AST, but
-  also mutates the old one in place.
- */
+/** Folds up any CSS rules that can be nested under each other. Returns a new AST
+but also mutates the old one in place. */
 let nestComponentRules = ast =>
   switch (ast) {
   | Postcss.Root({nodes} as root) =>

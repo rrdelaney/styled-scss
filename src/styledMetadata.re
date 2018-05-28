@@ -101,6 +101,14 @@ let isDynamicCondition = (component, atrule: Postcss.atrule) =>
   | _ => false
   };
 
+/** Replaces all usages of a prop name with an escaped name. */
+let replacePropName = (ruleValue, propName) => {
+  let replacerRe = Js.Re.fromStringWithFlags(~flags="g", "\\" ++ propName);
+  let rawPropName = Js.String.replace("$", "", propName);
+  let replacedVal = "_local_" ++ rawPropName;
+  Js.String.replaceByRe(replacerRe, replacedVal, ruleValue);
+};
+
 /** Extracts metadata from a Postcss AST and replaces dynamic atrule nodes with
 static class names. Note that the class name replacement happens in-place,
 and this method mutates the AST passed in. */
@@ -166,8 +174,17 @@ let rec extract =
     extractNodes(~nodes, ~metadata, ~component=currentComponent)
 
   /* Terminal things like declarations end the recursion. */
-  /* | Postcss.Decl({value} as decl) when Option.isSome(currentComponent) =>
-     let {props} = Option.getExn(currentComponent); */
+  | Postcss.Decl({value} as decl) when Option.isSome(currentComponent) =>
+    let {props} = Option.getExn(currentComponent);
+
+    let newValue =
+      Map.String.reduce(props, value, (ruleValue, propName, _propType) =>
+        replacePropName(ruleValue, propName)
+      );
+    let newRule = Postcss.Decl({...decl, value: newValue});
+    replaceSelf(newRule);
+
+    metadata;
 
   | _ => metadata
   }

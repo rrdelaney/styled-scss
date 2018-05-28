@@ -38,3 +38,6 @@ external importDeclaration : (array(node), node) => node = "";
 
 [@bs.module "@babel/types"]
 external importDefaultSpecifier : node => node = "";
+
+[@bs.module "@babel/types"]
+external importSpecifier : (node, node) => node = "";

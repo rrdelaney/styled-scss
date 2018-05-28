@@ -43,12 +43,24 @@ let buildImportStatement = outputMode =>
   switch (outputMode) {
   | `Emotion =>
     T.importDeclaration(
-      [|T.importDefaultSpecifier(T.identifier("styled"))|],
+      [|
+        T.importDefaultSpecifier(T.identifier("styled")),
+        T.importSpecifier(
+          T.identifier("injectGlobal"),
+          T.identifier("injectGlobal"),
+        ),
+      |],
       T.stringLiteral("react-emotion"),
     )
   | `Styled =>
     T.importDeclaration(
-      [|T.importDefaultSpecifier(T.identifier("styled"))|],
+      [|
+        T.importDefaultSpecifier(T.identifier("styled")),
+        T.importSpecifier(
+          T.identifier("injectGlobal"),
+          T.identifier("injectGlobal"),
+        ),
+      |],
       T.stringLiteral("styled-components"),
     )
   };

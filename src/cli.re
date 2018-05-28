@@ -7,25 +7,24 @@ module Flags = {
     reason: bool,
     [@bs.optional]
     debug: bool,
+    args: array(string),
   };
+  external decode : Js.Json.t => t = "%identity";
 };
 
-external parseFlags : Meow.flags => Flags.t = "%identity";
+let program =
+  Commander.program
+  |. Commander.version("1.0.0")
+  |. Commander.usage("[options] <file ...>")
+  |. Commander.option("--snake-case", "")
+  |. Commander.option("--reason", "")
+  |. Commander.option("--debug", "")
+  |. Commander.parse(Commander.Process.argv)
+  |. Flags.decode;
 
-let input =
-  Meow.make({|
-  styled-scss
+let files = Flags.args(program);
 
-    --snake-case
-    --reason
-    --debug
-|});
-
-let files = Meow.input(input);
-
-let flags = Meow.flags(input) |> parseFlags;
-
-let debug = Flags.debug(flags) |. Belt.Option.getWithDefault(false);
+let debug = Flags.debug(program) |. Belt.Option.getWithDefault(false);
 
 if (Array.length(files) == 0) {
   Js.Console.error("Must provide more than one file.");

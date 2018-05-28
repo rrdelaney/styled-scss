@@ -28,3 +28,13 @@ external variableDeclaration : (string, array(node)) => node = "";
 
 [@bs.module "@babel/types"]
 external exportNamedDeclaration : (node, array(node)) => node = "";
+
+[@bs.module "@babel/types"] external expressionStatement : node => node = "";
+
+[@bs.module "@babel/types"] external emptyStatement : unit => node = "";
+
+[@bs.module "@babel/types"]
+external importDeclaration : (array(node), node) => node = "";
+
+[@bs.module "@babel/types"]
+external importDefaultSpecifier : node => node = "";

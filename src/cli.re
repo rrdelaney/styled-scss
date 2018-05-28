@@ -1,12 +1,14 @@
+open Belt;
+
 module Flags = {
   [@bs.deriving abstract]
   type t = {
     [@bs.optional]
-    snakeCase: bool,
-    [@bs.optional]
-    reason: bool,
-    [@bs.optional]
     debug: bool,
+    [@bs.optional]
+    optimize: bool,
+    [@bs.optional]
+    output: string,
     args: array(string),
   };
   external decode : Js.Json.t => t = "%identity";
@@ -16,23 +18,41 @@ let program =
   Commander.program
   |. Commander.version("1.0.0")
   |. Commander.usage("[options] <file ...>")
-  |. Commander.option("--snake-case", "")
-  |. Commander.option("--reason", "")
-  |. Commander.option("--debug", "")
+  |. Commander.option(
+       "--optimize",
+       "optimize the output, only works with emotion",
+     )
+  |. Commander.option(
+       "--output [emotion|styled]",
+       "library to use for generated components",
+     )
+  |. Commander.option("--debug", "enable debug mode and print debug info")
   |. Commander.parse(Commander.Process.argv)
   |. Flags.decode;
 
 let files = Flags.args(program);
 
-let debug = Flags.debug(program) |. Belt.Option.getWithDefault(false);
+let debug = Flags.debug(program) |. Option.getWithDefault(false);
+
+let optimize = Flags.optimize(program) |. Option.getWithDefault(false);
+
+let outputMode =
+  Flags.output(program)
+  |. Option.flatMap(Compiler.outputModeFromJs)
+  |. Option.getWithDefault(`Emotion);
 
 if (Array.length(files) == 0) {
   Js.Console.error("Must provide more than one file.");
-  Node.Process.exit(-1);
+  Node.Process.exit(1);
 };
 
-let fileName = files[0];
+let fileName = Array.getExn(files, 0);
 
 let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
 
-Compiler.compile({fileName, fileSource, debug});
+if (outputMode != `Emotion && optimize) {
+  Js.Console.error("--optimize can only be used with Emotion output.");
+  Node.Process.exit(1);
+};
+
+Compiler.compile({fileName, fileSource, debug, outputMode, optimize});

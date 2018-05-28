@@ -29,3 +29,9 @@
 [@bs.module "chalk"] external cyanBright : string => string = "";
 
 [@bs.module "chalk"] external whiteBright : string => string = "";
+
+[@bs.module "chalk"] external bold : string => string = "";
+
+[@bs.module "chalk"] external dim : string => string = "";
+
+[@bs.module "chalk"] external italic : string => string = "";

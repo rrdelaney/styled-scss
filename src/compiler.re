@@ -41,10 +41,15 @@ module Debug = {
     };
 };
 
+[@bs.deriving jsConverter]
+type outputMode = [ | [@bs.as "styled"] `Styled | [@bs.as "emotion"] `Emotion];
+
 type options = {
   fileName: string,
   fileSource: string,
   debug: bool,
+  outputMode,
+  optimize: bool,
 };
 
 let compile = options => {
@@ -71,9 +76,22 @@ let compile = options => {
   let nestedAst = NestCss.nestComponentRules(cssAst);
   Debug.printStage("Insert statements", `PrettyCss(nestedAst));
 
-  let jsAst = ComponentBuilder.buildComponents(nestedAst, styledMetadata);
+  let jsAst =
+    ComponentBuilder.buildComponents(
+      options.outputMode,
+      nestedAst,
+      styledMetadata,
+    );
   Debug.printStage("Generate Emotion", `PrettyJs(jsAst));
 
-  let optimizedProgram = OptimizeEmotion.optimize(jsAst, options.fileName);
-  Debug.printStage("Optimize output", `Js(optimizedProgram));
+  let _optimizedProgram =
+    if (options.optimize) {
+      let opt = OptimizeEmotion.optimize(jsAst, options.fileName);
+      Debug.printStage("Optimize output", `Js(opt));
+      opt;
+    } else {
+      Debug.printStage("Optimize output", `Str(Chalk.dim("Skipped")));
+      jsAst;
+    };
+  ();
 };

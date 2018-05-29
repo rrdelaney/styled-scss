@@ -41,3 +41,14 @@ external importDefaultSpecifier : node => node = "";
 
 [@bs.module "@babel/types"]
 external importSpecifier : (node, node) => node = "";
+
+[@bs.module "@babel/types"]
+external arrowFunctionExpression : (array(node), node) => node = "";
+
+[@bs.module "@babel/types"]
+external logicalExpression : (string, node, node) => node = "";
+
+[@bs.module "@babel/types"] external objectPattern : array(node) => node = "";
+
+[@bs.module "@babel/types"]
+external objectProperty : (node, node) => node = "";

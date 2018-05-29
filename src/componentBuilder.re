@@ -128,8 +128,8 @@ let buildGlobalCss = css =>
     ),
   );
 
-let buildImportStatement = outputMode =>
-  switch (outputMode) {
+let buildImportStatement = runtime =>
+  switch (runtime) {
   | `Emotion =>
     T.importDeclaration(
       [|
@@ -157,7 +157,7 @@ let buildImportStatement = outputMode =>
 /** Builds a JS ast exporting emotion components from a css ast and metadata
 collected before being compiled with Sass. */
 let buildComponents =
-    (outputMode, ast: Postcss.node, metadata: StyledMetadata.metadata) => {
+    (runtime, ast: Postcss.node, metadata: StyledMetadata.metadata) => {
   let nodes =
     switch (ast) {
     | Postcss.Root({nodes}) => nodes
@@ -179,6 +179,6 @@ let buildComponents =
       | cssNode => buildGlobalCss(Postcss.stringify(cssNode))
       }
     );
-  let importStatement = buildImportStatement(outputMode);
+  let importStatement = buildImportStatement(runtime);
   T.program(Array.concat([|importStatement|], componentNodes));
 };

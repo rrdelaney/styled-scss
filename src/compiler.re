@@ -42,13 +42,13 @@ module Debug = {
 };
 
 [@bs.deriving jsConverter]
-type outputMode = [ | [@bs.as "styled"] `Styled | [@bs.as "emotion"] `Emotion];
+type runtime = [ | [@bs.as "styled"] `Styled | [@bs.as "emotion"] `Emotion];
 
 type options = {
   fileName: string,
   fileSource: string,
   debug: bool,
-  outputMode,
+  runtime,
   optimize: bool,
 };
 
@@ -78,7 +78,7 @@ let compile = options => {
 
   let jsAst =
     ComponentBuilder.buildComponents(
-      options.outputMode,
+      options.runtime,
       nestedAst,
       styledMetadata,
     );

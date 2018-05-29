@@ -8,7 +8,7 @@ module Flags = {
     [@bs.optional]
     optimize: bool,
     [@bs.optional]
-    output: string,
+    runtime: string,
     args: array(string),
   };
   external decode : Js.Json.t => t = "%identity";
@@ -23,7 +23,7 @@ let program =
        "optimize the output, only works with emotion",
      )
   |. Commander.option(
-       "--output [emotion|styled]",
+       "--runtime [emotion|styled]",
        "library to use for generated components",
      )
   |. Commander.option("--debug", "enable debug mode and print debug info")
@@ -36,9 +36,9 @@ let debug = Flags.debug(program) |. Option.getWithDefault(false);
 
 let optimize = Flags.optimize(program) |. Option.getWithDefault(false);
 
-let outputMode =
-  Flags.output(program)
-  |. Option.flatMap(Compiler.outputModeFromJs)
+let runtime =
+  Flags.runtime(program)
+  |. Option.flatMap(Compiler.runtimeFromJs)
   |. Option.getWithDefault(`Emotion);
 
 if (Array.length(files) == 0) {
@@ -50,9 +50,9 @@ let fileName = Array.getExn(files, 0);
 
 let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
 
-if (outputMode != `Emotion && optimize) {
+if (runtime != `Emotion && optimize) {
   Js.Console.error("--optimize can only be used with Emotion output.");
   Node.Process.exit(1);
 };
 
-Compiler.compile({fileName, fileSource, debug, outputMode, optimize});
+Compiler.compile({fileName, fileSource, debug, runtime, optimize});

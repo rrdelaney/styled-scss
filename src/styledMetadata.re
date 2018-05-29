@@ -81,16 +81,13 @@ let ifConditionSelector = metadata =>
 
 /** Adds an if condition from an atrule to the collected metadata. */
 let addIfCondition = (params, metadata) => {
-  Js.log(params);
-  {
-    ...metadata,
-    ifConditions:
-      Map.String.set(
-        metadata.ifConditions,
-        ifConditionSelector(metadata),
-        {condition: params},
-      ),
-  };
+  ...metadata,
+  ifConditions:
+    Map.String.set(
+      metadata.ifConditions,
+      ifConditionSelector(metadata),
+      {condition: params},
+    ),
 };
 
 /** Determines if a given `if` condition is dynamic, or should be statically

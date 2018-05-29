@@ -14,7 +14,8 @@ external taggedTemplateExpression : (node, node) => node = "";
 [@bs.module "@babel/types"]
 external templateLiteral : (array(node), array(node)) => node = "";
 
-[@bs.module "@babel/types"] external templateElement : value => node = "";
+[@bs.module "@babel/types"]
+external templateElement : (value, bool) => node = "";
 
 [@bs.module "@babel/types"] external program : array(node) => node = "";
 

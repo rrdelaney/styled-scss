@@ -15,7 +15,7 @@ let templatePartsToLiteral = parts => {
       switch (part) {
       | StringLiteral(raw)
           when
-            Array.length(literals) >= Array.length(expressions)
+            Array.length(literals) > Array.length(expressions)
             && Array.length(literals) > 0 => (
           Belt.Array.mapWithIndex(literals, (index, literal) =>
             if (index == Array.length(literals) - 1) {
@@ -31,7 +31,16 @@ let templatePartsToLiteral = parts => {
       }
     );
   let literals =
-    Array.map(literals, raw => T.templateElement(T.value(~raw)));
+    Array.map(literals, raw => T.templateElement(T.value(~raw), false));
+  let literals =
+    if (Array.length(literals) == Array.length(expressions)) {
+      Array.concat(
+        literals,
+        [|T.templateElement(T.value(~raw=""), true)|],
+      );
+    } else {
+      literals;
+    };
   T.templateLiteral(literals, expressions);
 };
 
@@ -67,11 +76,7 @@ let rec buildTemplateFromNode =
     let nodesCssTemplate =
       T.taggedTemplateExpression(
         T.identifier("css"),
-        templatePartsToLiteral(
-          Array.map(nodes, node =>
-            buildTemplateFromNode(component, metadata, node)
-          ),
-        ),
+        nodesToTemplateLiteral(component, metadata, nodes),
       );
     Expression(
       T.arrowFunctionExpression(
@@ -80,7 +85,13 @@ let rec buildTemplateFromNode =
       ),
     );
   | node => StringLiteral(Postcss.stringify(node) ++ ";")
-  };
+  }
+and nodesToTemplateLiteral = (component, metadata, nodes) =>
+  templatePartsToLiteral(
+    Array.map(nodes, node =>
+      buildTemplateFromNode(component, metadata, node)
+    ),
+  );
 
 /** Builds a new emotion component from an array of css rules. */
 let buildComponent =
@@ -91,11 +102,7 @@ let buildComponent =
     ) =>
   T.taggedTemplateExpression(
     T.memberExpression(T.identifier("styled"), T.identifier("div")),
-    templatePartsToLiteral(
-      Array.map(ast, node =>
-        buildTemplateFromNode(component, metadata, node)
-      ),
-    ),
+    nodesToTemplateLiteral(component, metadata, ast),
   );
 
 /** Creates `export const $exportName = $exportNode;` ast node. */
@@ -114,7 +121,10 @@ let buildGlobalCss = css =>
   T.expressionStatement(
     T.taggedTemplateExpression(
       T.identifier("injectGlobal"),
-      T.templateLiteral([|T.templateElement(T.value(~raw=css))|], [||]),
+      T.templateLiteral(
+        [|T.templateElement(T.value(~raw=css), false)|],
+        [||],
+      ),
     ),
   );
 

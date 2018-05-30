@@ -3,7 +3,13 @@ type value = {raw: string};
 
 type node;
 
+module Identifier = {
+  [@bs.deriving abstract]
+  type t = pri {mutable name: string};
+};
 [@bs.module "@babel/types"] external identifier : string => node = "";
+[@bs.module "@babel/types"] external isIdentifier : node => bool = "";
+external asIdentifier : node => Identifier.t = "%identity";
 
 [@bs.module "@babel/types"]
 external memberExpression : (node, node) => node = "";
@@ -52,4 +58,4 @@ external logicalExpression : (string, node, node) => node = "";
 [@bs.module "@babel/types"] external objectPattern : array(node) => node = "";
 
 [@bs.module "@babel/types"]
-external objectProperty : (node, node) => node = "";
+external objectProperty : (node, node, bool, bool) => node = "";

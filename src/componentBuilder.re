@@ -89,8 +89,29 @@ let rec buildTemplateFromNode =
       when ruleIsIfCondition(metadata, selector) =>
     let condition =
       Map.String.getExn(metadata.ifConditions, selector).condition;
-    let conditionNode =
-      Babel_parser.getExpression(Babel_parser.parse(condition));
+    let parsed = Babel_parser.parse(condition);
+    let conditionNode = Babel_parser.getProgram(parsed);
+
+    Babel_traverse.traverse(
+      conditionNode,
+      Babel_traverse.traverser(~enter=path => {
+        let node = Babel_traverse.Path.node(path);
+        if (Babel_types.isIdentifier(node)) {
+          let identifier = Babel_types.asIdentifier(node);
+          let identifierName = Babel_types.Identifier.name(identifier);
+          let isSassVariable = Js.String.startsWith("$", identifierName);
+          if (isSassVariable) {
+            Babel_types.Identifier.nameSet(
+              identifier,
+              rawPropName(identifierName),
+            );
+          };
+        };
+      }),
+    );
+
+    let conditionNode = Babel_parser.getExpression(parsed);
+
     let destructuredParams =
       T.objectPattern(
         component.props
@@ -99,6 +120,8 @@ let rec buildTemplateFromNode =
              T.objectProperty(
                T.identifier(rawPropName(prop)),
                T.identifier(rawPropName(prop)),
+               false,
+               true,
              )
            ),
       );

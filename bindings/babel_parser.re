@@ -9,6 +9,8 @@ external asExpression : output => expressionOutput = "%identity";
 
 [@bs.module "@babel/parser"] external parse : string => output = "";
 
+external getProgram : output => Babel_types.node = "%identity";
+
 let getNode = (output: output) =>
   Belt.Array.getExn(output##program##body, 0);
 

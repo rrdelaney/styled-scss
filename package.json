@@ -2,7 +2,7 @@
   "name": "styled-scss",
   "version": "0.0.1",
   "description": "A Sass to React compiler",
-  "main": "index.js",
+  "main": "src/node.js",
   "scripts": {
     "test": "jest",
     "build": "bsb -clean-world -make-world",

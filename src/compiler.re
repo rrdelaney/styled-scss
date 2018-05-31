@@ -84,7 +84,7 @@ let compile = options => {
     );
   Debug.printStage("Generate Emotion", `PrettyJs(jsAst));
 
-  let _optimizedProgram =
+  let optimizedProgram =
     if (options.optimize) {
       let opt = OptimizeEmotion.optimize(jsAst, options.fileName);
       Debug.printStage("Optimize output", `Js(opt));
@@ -93,5 +93,12 @@ let compile = options => {
       Debug.printStage("Optimize output", `Str(Chalk.dim("Skipped")));
       jsAst;
     };
-  ();
+
+  let generated = Babel_generator.generate(optimizedProgram)##code;
+
+  if (options.optimize) {
+    generated;
+  } else {
+    Prettier.formatJs(generated);
+  };
 };

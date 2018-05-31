@@ -39,20 +39,29 @@ let optimize = Flags.optimize(program) |. Option.getWithDefault(false);
 let runtime =
   Flags.runtime(program)
   |. Option.flatMap(Compiler.runtimeFromJs)
-  |. Option.getWithDefault(`Emotion);
+  |. Option.getWithDefault(`Styled);
 
 if (Array.length(files) == 0) {
   Js.Console.error("Must provide more than one file.");
   Node.Process.exit(1);
 };
 
-let fileName = Array.getExn(files, 0);
-
-let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
-
 if (runtime != `Emotion && optimize) {
   Js.Console.error("--optimize can only be used with Emotion output.");
   Node.Process.exit(1);
 };
 
-Compiler.compile({fileName, fileSource, debug, runtime, optimize});
+let compileFile = fileName => {
+  let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
+
+  let output =
+    Compiler.compile({fileName, fileSource, debug, runtime, optimize});
+
+  let styleExtension = "Styles.js";
+  let outputName =
+    Node.Path.basename_ext(fileName, ".scss") ++ styleExtension;
+
+  Node.Fs.writeFileAsUtf8Sync(outputName, output);
+};
+
+Array.forEach(files, compileFile);

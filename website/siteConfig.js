@@ -24,8 +24,7 @@ const siteConfig = {
   title: 'styled-scss',
   tagline: 'Dynamic Sass powered by Styled Components',
   url: 'https://rrdelaney.github.io',
-  baseUrl: '/styled-scss',
-  projectName: 'styled-scss',
+  baseUrl: '/styled-scss/',
   organizationName: 'rrdelaney',
 
   // For no header links in the top nav bar -> headerLinks: [],
@@ -47,7 +46,7 @@ const siteConfig = {
   /* colors for website */
   colors: {
     primaryColor: '#cc6699',
-    secondaryColor: '#205C3B'
+    secondaryColor: '#003366'
   },
 
   /* custom fonts for website */
@@ -79,10 +78,6 @@ const siteConfig = {
   /* Open Graph and Twitter card images */
   // ogImage: 'img/docusaurus.png',
   // twitterImage: 'img/docusaurus.png'
-
-  // You may provide arbitrary config keys to be used as needed by your
-  // template. For example, if you need your repo's URL...
-  //   repoUrl: 'https://github.com/facebook/test-site',
 }
 
 module.exports = siteConfig

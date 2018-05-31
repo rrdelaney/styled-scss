@@ -3,9 +3,17 @@
   "version": "0.0.1",
   "description": "A Sass to React compiler",
   "main": "src/node.js",
+  "bin": {
+    "styled": "./src/cli.bs.js"
+  },
+  "files": [
+    "bindings/*.js",
+    "src/*.js"
+  ],
   "scripts": {
     "test": "jest",
     "build": "bsb -clean-world -make-world",
+    "postbuild": "ex -sc '1i|#!/usr/bin/env node' -cx src/cli.bs.js",
     "local": "node src/cli.bs.js"
   },
   "repository": {

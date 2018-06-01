@@ -1,5 +1,7 @@
 import json from 'rollup-plugin-json'
 import alias from 'rollup-plugin-alias'
+import commonjs from 'rollup-plugin-commonjs'
+import resolve from 'rollup-plugin-node-resolve'
 import base from './rollup.config.base'
 
 export default {
@@ -15,7 +17,10 @@ export default {
       prettier: require.resolve('prettier/standalone'),
       '@babel/core': require.resolve('@babel/standalone')
     }),
-    ...base.plugins,
+    commonjs(),
+    resolve({
+      browser: true
+    }),
     json()
   ]
 }

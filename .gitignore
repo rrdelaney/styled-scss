@@ -30,9 +30,9 @@ website/i18n/*
 !website/i18n/en.json
 
 # Bundled JS
-cli.js
-index.js
-web.js
+/cli.js
+/index.js
+/web.js
 
 # Test files
 test.scss

@@ -9,6 +9,7 @@ let ruleIsIfCondition = (metadata: StyledMetadata.metadata, selector) =>
 
 let rec buildTemplateFromNode =
         (
+          ~propsInContext=false,
           component: StyledMetadata.component,
           metadata: StyledMetadata.metadata,
           node: Postcss.node,
@@ -37,7 +38,12 @@ let rec buildTemplateFromNode =
     let nodesCssTemplate =
       T.taggedTemplateExpression(
         T.identifier("css"),
-        nodesToTemplateLiteral(component, metadata, nodes),
+        nodesToTemplateLiteral(
+          ~propsInContext=true,
+          component,
+          metadata,
+          nodes,
+        ),
       );
     TemplateStringBuilder.addExpression(
       T.arrowFunctionExpression(
@@ -47,15 +53,43 @@ let rec buildTemplateFromNode =
       template,
     );
   | node =>
-    TemplateStringBuilder.addLiteral(
-      Postcss.stringify(node) ++ ";",
-      template,
-    )
+    let nodeCss = Postcss.stringify(node) ++ ";";
+    let splitOnVars = Js.String.split("_local_", nodeCss);
+    Array.reduce(splitOnVars, template, (template, nodeStr) =>
+      if (Js.String.startsWith("var_", nodeStr) && propsInContext) {
+        let localName = Js.String.replace("var_", "", nodeStr);
+        TemplateStringBuilder.addExpression(
+          T.identifier(localName),
+          template,
+        );
+      } else if (Js.String.startsWith("var_", nodeStr)) {
+        let localName = Js.String.replace("var_", "", nodeStr);
+        TemplateStringBuilder.addExpression(
+          T.arrowFunctionExpression(
+            [|T.identifier("props")|],
+            T.memberExpression(
+              T.identifier("props"),
+              T.identifier(localName),
+            ),
+          ),
+          template,
+        );
+      } else {
+        TemplateStringBuilder.addLiteral(nodeStr, template);
+      }
+    );
   }
-and nodesToTemplateLiteral = (component, metadata, nodes) => {
+and nodesToTemplateLiteral =
+    (~propsInContext=false, component, metadata, nodes) => {
   let template =
     Array.reduce(nodes, TemplateStringBuilder.empty, (template, node) =>
-      buildTemplateFromNode(component, metadata, node, template)
+      buildTemplateFromNode(
+        ~propsInContext,
+        component,
+        metadata,
+        node,
+        template,
+      )
     );
   TemplateStringBuilder.build(template);
 };

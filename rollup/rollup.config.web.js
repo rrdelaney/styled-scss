@@ -9,7 +9,9 @@ export default {
   input: 'src/api.bs.js',
   output: {
     ...base.output,
-    file: 'web.js'
+    file: 'web.js',
+    format: 'iife',
+    name: 'styled'
   },
   external: [],
   plugins: [

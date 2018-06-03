@@ -105,7 +105,7 @@ let isDynamicCondition = (component, atrule: Postcss.atrule) =>
 let replacePropName = (ruleValue, propName) => {
   let replacerRe = Js.Re.fromStringWithFlags(~flags="g", "\\" ++ propName);
   let rawPropName = Js.String.replace("$", "", propName);
-  let replacedVal = "_local_" ++ rawPropName;
+  let replacedVal = "_local_var_" ++ rawPropName ++ "_local_";
   Js.String.replaceByRe(replacerRe, replacedVal, ruleValue);
 };
 

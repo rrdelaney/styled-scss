@@ -61,7 +61,9 @@ let compileFile = fileName => {
   let outputName =
     Node.Path.basename_ext(fileName, ".scss") ++ styleExtension;
 
-  Node.Fs.writeFileAsUtf8Sync(outputName, output);
+  if (! debug) {
+    Node.Fs.writeFileAsUtf8Sync(outputName, output);
+  };
 };
 
 Array.forEach(files, compileFile);

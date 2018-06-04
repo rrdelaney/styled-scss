@@ -102,7 +102,10 @@ let buildComponent =
       ast: array(Postcss.node),
     ) =>
   T.taggedTemplateExpression(
-    T.memberExpression(T.identifier("styled"), T.identifier("div")),
+    T.memberExpression(
+      T.identifier("styled"),
+      T.identifier(component.element),
+    ),
     nodesToTemplateLiteral(component, metadata, ast),
   );
 

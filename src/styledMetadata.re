@@ -11,6 +11,7 @@ let getNodes =
 
 /** Metadata about a component declared in the input Sass file. */
 type component = {
+  element: string,
   name: string,
   props: Map.String.t(string),
 };
@@ -54,24 +55,31 @@ let extractProps = str => {
   };
 };
 
+/** Determines if an atrule is trying to generate a styled component. */
+let isComponentAtrule = Js.String.startsWith("styled.");
+
+/** Returns the type of element to be generated for the component. */
+let componentElementType = Js.String.replace("styled.", "");
+
 /** Creates a selector for a component declared in an atrule. */
 let componentSelector = params =>
   "." ++ extractComponentName(params) ++ "Component";
 
 /** Creates a new metadata object for a component based on atrule params. */
-let createComponent = params => {
+let createComponent = (rule, params) => {
   name: extractComponentName(params),
   props: extractProps(params),
+  element: componentElementType(rule),
 };
 
 /** Adds a component from an atrule to the collected metadata. */
-let addComponent = (params, metadata) => {
+let addComponent = (rule, params, metadata) => {
   ...metadata,
   components:
     Belt.Map.String.set(
       metadata.components,
       componentSelector(params),
-      createComponent(params),
+      createComponent(rule, params),
     ),
 };
 
@@ -133,7 +141,7 @@ let rec extract =
        )
 
   /* Component at rules are replaced with a component selector, but same nodes. */
-  | Postcss.Atrule(atrule) when atrule.name == "component" =>
+  | Postcss.Atrule(atrule) when isComponentAtrule(atrule.name) =>
     let newRule =
       Postcss.Rule({
         source: atrule.source,
@@ -144,8 +152,8 @@ let rec extract =
     let metadata =
       extractNodes(
         ~nodes=getNodes(newRule),
-        ~metadata=addComponent(atrule.params, metadata),
-        ~component=Some(createComponent(atrule.params)),
+        ~metadata=addComponent(atrule.name, atrule.params, metadata),
+        ~component=Some(createComponent(atrule.name, atrule.params)),
       );
     replaceSelf(newRule);
     metadata;

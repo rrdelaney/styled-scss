@@ -2,7 +2,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 
 const dependencies = Object.keys(require('../package.json').dependencies)
-const external = [...dependencies, 'path', 'fs', 'process']
+const external = [...dependencies, 'reason', 'path', 'fs', 'process']
 
 export default {
   output: {

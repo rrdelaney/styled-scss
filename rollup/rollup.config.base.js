@@ -7,7 +7,8 @@ const external = [...dependencies, 'reason', 'path', 'fs', 'process']
 export default {
   output: {
     format: 'cjs',
-    exports: 'named'
+    exports: 'named',
+    interop: false,
   },
   external,
   plugins: [commonjs(), resolve()]

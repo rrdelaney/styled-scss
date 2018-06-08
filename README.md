@@ -56,3 +56,26 @@ export const SpecialButton = styled.button`
     `};
 `;
 ```
+
+## Docs
+
+<p><details>
+<summary><b>Type generation</b></summary>
+
+styled-scss can also generate type interfaces to go along with the code! Right now it can
+only do Reason, but TypeScript and Flow should be supported soon
+
+```
+$ styled page.scss --types reason
+```
+</details></p>
+
+<p><details>
+<summary><b>I don't like styled-components though!</b></summary>
+
+styled-scss can also output to an Emotion runtime! Just pass the `--runtime` flag to the CLI
+
+```
+$ styled page.scss --runtime emotion
+```
+</details></p>

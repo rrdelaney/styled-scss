@@ -9,6 +9,8 @@ module Flags = {
     optimize: bool,
     [@bs.optional]
     runtime: string,
+    [@bs.optional]
+    types: string,
     args: array(string),
   };
   external decode : Js.Json.t => t = "%identity";
@@ -26,6 +28,10 @@ let program =
        "--runtime [emotion|styled]",
        "library to use for generated components",
      )
+  |. Commander.option(
+       "--types [reason]",
+       "emit type definitions for usage with ReasonReact",
+     )
   |. Commander.option("--debug", "enable debug mode and print debug info")
   |. Commander.parse(Commander.Process.argv)
   |. Flags.decode;
@@ -41,6 +47,8 @@ let runtime =
   |. Option.flatMap(Compiler.runtimeFromJs)
   |. Option.getWithDefault(`Styled);
 
+let types = Flags.types(program) |. Option.flatMap(Compiler.typesFromJs);
+
 if (Array.length(files) == 0) {
   Js.Console.error("Must provide more than one file.");
   Node.Process.exit(1);
@@ -55,14 +63,16 @@ let compileFile = fileName => {
   let fileSource = Node.Fs.readFileAsUtf8Sync(fileName);
 
   let output =
-    Compiler.compile({fileName, fileSource, debug, runtime, optimize});
-
-  let styleExtension = "Styles.js";
-  let outputName =
-    Node.Path.basename_ext(fileName, ".scss") ++ styleExtension;
+    Compiler.compile({fileName, fileSource, debug, runtime, types, optimize});
 
   if (! debug) {
-    Node.Fs.writeFileAsUtf8Sync(outputName, output);
+    Node.Fs.writeFileAsUtf8Sync(output.fileName, output.source);
+
+    switch (output.typesFileName, output.types) {
+    | (Some(typesFileName), Some(typesSource)) =>
+      Node.Fs.writeFileAsUtf8Sync(typesFileName, typesSource)
+    | _ => ()
+    };
   };
 };
 

@@ -51,6 +51,7 @@
     "fb-watchman": "^2.0.0",
     "postcss": "^6.0.22",
     "prettier": "^1.13.3",
+    "reasonably-typed": "^2.0.0-beta4",
     "sass": "^1.5.1"
   },
   "devDependencies": {

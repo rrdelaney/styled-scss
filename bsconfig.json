@@ -2,7 +2,11 @@
   "name": "backsass",
   "version": "0.0.1",
   "sources": ["bindings", "src"],
-  "bs-dependencies": ["@glennsl/bs-jest", "@glennsl/bs-json"],
+  "bs-dependencies": [
+    "@glennsl/bs-jest",
+    "@glennsl/bs-json",
+    "reasonably-typed"
+  ],
   "package-specs": {
     "module": "commonjs",
     "in-source": true

@@ -1,3 +1,5 @@
+open Belt;
+
 module Debug = {
   /** If debug mode is enabled. */
   let enabled = ref(false);
@@ -44,12 +46,23 @@ module Debug = {
 [@bs.deriving jsConverter]
 type runtime = [ | [@bs.as "styled"] `Styled | [@bs.as "emotion"] `Emotion];
 
+[@bs.deriving jsConverter]
+type types = [ | [@bs.as "reason"] `Reason];
+
 type options = {
   fileName: string,
   fileSource: string,
   debug: bool,
   runtime,
   optimize: bool,
+  types: option(types),
+};
+
+type output = {
+  source: string,
+  fileName: string,
+  types: option(string),
+  typesFileName: option(string),
 };
 
 let compile = options => {
@@ -96,9 +109,40 @@ let compile = options => {
 
   let generated = Babel_generator.generate(optimizedProgram)##code;
 
-  if (options.optimize) {
-    generated;
-  } else {
-    Prettier.formatJs(generated);
+  let outputSource =
+    if (options.optimize) {
+      generated;
+    } else {
+      Prettier.formatJs(generated);
+    };
+
+  let outputName =
+    Node.Path.basename_ext(options.fileName, ".scss") ++ "Styles.js";
+
+  let outputTypes =
+    switch (options.types) {
+    | Some(`Reason) =>
+      Some(
+        TypeGenerator.generateReasonDefinition(outputName, styledMetadata),
+      )
+    | None => None
+    };
+
+  let outputTypesFileName =
+    switch (options.types) {
+    | Some(`Reason) => Some(Js.String.replace(".js", ".re", outputName))
+    | None => None
+    };
+
+  Debug.printStage(
+    "Generate types",
+    `Str(Option.getWithDefault(outputTypes, Chalk.dim("Skipped"))),
+  );
+
+  {
+    source: outputSource,
+    fileName: outputName,
+    types: outputTypes,
+    typesFileName: outputTypesFileName,
   };
 };

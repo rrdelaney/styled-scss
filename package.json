@@ -1,6 +1,6 @@
 {
   "name": "styled-scss",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Sass to React compiler",
   "bin": {
     "styled": "./cli.js"
@@ -15,7 +15,8 @@
     "build:js": "bsb -clean-world -make-world",
     "build:cli": "rollup -c rollup/rollup.config.cli.js",
     "build:api": "rollup -c rollup/rollup.config.api.js",
-    "build:web": "rollup -c rollup/rollup.config.web.js"
+    "build:web": "rollup -c rollup/rollup.config.web.js",
+    "build:all": "bsb -clean-world -make-world && rollup -c rollup/rollup.config.cli.js && rollup -c rollup/rollup.config.api.js"
   },
   "repository": {
     "type": "git",

@@ -117,7 +117,10 @@ let compile = options => {
     };
 
   let outputName =
-    Node.Path.basename_ext(options.fileName, ".scss") ++ "Styles.js";
+    Node.Path.join([|
+      Node.Path.dirname(options.fileName),
+      Node.Path.basename_ext(options.fileName, ".scss") ++ "Styles.js",
+    |]);
 
   let outputTypes =
     switch (options.types) {

@@ -81,7 +81,14 @@ let compile = options => {
   Debug.printStage("Metadata Extracted", `Css(ast));
 
   let sassSource = Postcss.stringify(ast);
-  let sassCompilation = Sass.renderSync(Sass.options(~data=sassSource, ()));
+  let sassCompilation =
+    Sass.renderSync(
+      Sass.options(
+        ~data=sassSource,
+        ~includePaths=[|Node.Path.dirname(options.fileName)|],
+        (),
+      ),
+    );
   let cssSource = sassCompilation |. Sass.Result.css |. Sass.Buffer.toString();
   Debug.printStage("Compiled with Sass", `Str(cssSource));
 

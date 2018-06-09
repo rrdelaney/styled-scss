@@ -4,7 +4,8 @@ open Belt;
 let getNodes =
   fun
   | Postcss.Root({nodes}) => nodes
-  | Postcss.Atrule({nodes}) => nodes
+  | Postcss.Atrule({nodes: None}) => [||]
+  | Postcss.Atrule({nodes: Some(nodes)}) => nodes
   | Postcss.Rule({nodes}) => nodes
   | Postcss.Decl(_) => [||]
   | Postcss.Unknown(_) => [||];
@@ -140,13 +141,16 @@ let rec extract =
          },
        )
 
+  | Postcss.Atrule({nodes: None}) => metadata
+
   /* Component at rules are replaced with a component selector, but same nodes. */
-  | Postcss.Atrule(atrule) when isComponentAtrule(atrule.name) =>
+  | Postcss.Atrule({nodes: Some(nodes)} as atrule)
+      when isComponentAtrule(atrule.name) =>
     let newRule =
       Postcss.Rule({
         source: atrule.source,
         raws: atrule.raws,
-        nodes: atrule.nodes,
+        nodes,
         selector: componentSelector(atrule.params),
       });
     let metadata =
@@ -159,12 +163,13 @@ let rec extract =
     metadata;
 
   /* If statements are replaced with a special selector too. */
-  | Postcss.Atrule(atrule) when isDynamicCondition(currentComponent, atrule) =>
+  | Postcss.Atrule({nodes: Some(nodes)} as atrule)
+      when isDynamicCondition(currentComponent, atrule) =>
     let newRule =
       Postcss.Rule({
         source: atrule.source,
         raws: atrule.raws,
-        nodes: atrule.nodes,
+        nodes,
         selector: ifConditionSelector(metadata),
       });
     let metadata =
@@ -177,7 +182,7 @@ let rec extract =
     metadata;
 
   /* Anything else that has child nodes should just recurse down into them. */
-  | Postcss.Atrule({nodes})
+  | Postcss.Atrule({nodes: Some(nodes)})
   | Postcss.Rule({nodes}) =>
     extractNodes(~nodes, ~metadata, ~component=currentComponent)
 

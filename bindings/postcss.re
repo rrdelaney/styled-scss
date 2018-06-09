@@ -47,7 +47,7 @@ and atrule = {
   raws: Internal.Raws.t,
   name: string,
   params: string,
-  nodes: array(node),
+  nodes: option(array(node)),
 }
 and decl = {
   source,
@@ -108,7 +108,7 @@ module Decoder = {
         source: json |> field("source", source),
         name: json |> field("name", string),
         params: json |> field("params", string),
-        nodes: json |> field("nodes", array(node)),
+        nodes: json |> optional(field("nodes", array(node))),
         raws: json |> field("raws", Internal.Raws.fromJson),
       },
     )
@@ -169,7 +169,7 @@ module Encoder = {
         ("source", source(data.source)),
         ("name", string(data.name)),
         ("params", string(data.params)),
-        ("nodes", array(node, data.nodes)),
+        ("nodes", nullable(array(node), data.nodes)),
         ("raws", Internal.Raws.toJson(data.raws)),
       ])
     )

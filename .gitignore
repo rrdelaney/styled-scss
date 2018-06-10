@@ -36,3 +36,5 @@ website/i18n/*
 
 # Test files
 test.scss
+testStyles.re
+testStyles.js

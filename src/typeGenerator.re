@@ -1,5 +1,12 @@
 open Belt;
 
+let typeFromPropType = t =>
+  switch (t) {
+  | "string" => ReasonablyTyped.DotTyped.String
+  | "boolean" => ReasonablyTyped.DotTyped.Boolean
+  | _ => ReasonablyTyped.DotTyped.String
+  };
+
 let generateReasonDefinition = (outputName, metadata: StyledMetadata.metadata) => {
   let components = Map.String.valuesToArray(metadata.components);
 
@@ -11,13 +18,13 @@ let generateReasonDefinition = (outputName, metadata: StyledMetadata.metadata) =
           ReasonablyTyped.DotTyped.Object({
             properties:
               Map.String.toArray(component.props)
-              |. Array.map(((propName, _propType)) =>
+              |. Array.map(((propName, propType)) =>
                    ReasonablyTyped.DotTyped.{
                      name:
                        ReasonablyTyped.DotTyped.Identifier(
                          Js.String.replace("$", "", propName),
                        ),
-                     type_: ReasonablyTyped.DotTyped.String,
+                     type_: typeFromPropType(propType),
                      optional: true,
                    }
                  ),

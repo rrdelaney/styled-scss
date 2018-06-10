@@ -36,7 +36,10 @@ let generateReasonDefinition = (outputName, metadata: StyledMetadata.metadata) =
 
   let styledModule =
     ReasonablyTyped.DotTyped.ModuleDeclaration({
-      name: ReasonablyTyped.DotTyped.Identifier("./" ++ outputName),
+      name:
+        ReasonablyTyped.DotTyped.Identifier(
+          "./" ++ Node.Path.basename(outputName),
+        ),
       declarations: componentDeclarations,
     });
 

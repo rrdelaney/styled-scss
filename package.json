@@ -1,6 +1,6 @@
 {
   "name": "styled-scss",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A Sass to React compiler",
   "bin": {
     "styled": "./cli.js"
